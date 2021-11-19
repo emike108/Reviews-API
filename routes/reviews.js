@@ -1,17 +1,11 @@
 import express from 'express';
-import db from '../db/index.js';
+import apiMethods from '../controllers/reviews.js';
 const router = express.Router();
 
-router.get('/', (req, res) => {
-  const queryString = 'SELECT * FROM reviews LIMIT 1'
-  db.query(queryString, (err, results) => {
-    if (err) {
-      console.error(err);
-    } else {
-      res.send(results);
-    }
-  })
-});
-
+router.get('/', apiMethods.getOne);//edit to match docs
+// router.post('/', apiMethods.);
+// router.get('/meta', apiMethods.);
+// router.put('/:review_id/helpful', apiMethods.);
+// router.put('/:review_id/report', apiMethods.);
 
 export default router;
