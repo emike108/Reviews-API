@@ -1,7 +1,7 @@
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 import dbConfig from './config.js'
 
-const connection = mysql.createConnection(dbConfig);
+const connection = await mysql.createConnection(dbConfig);
 
 connection.connect(err => {
   if (err) {
