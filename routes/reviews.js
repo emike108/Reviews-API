@@ -2,10 +2,10 @@ import express from 'express';
 import apiMethods from '../controllers/reviews.js';
 const router = express.Router();
 
-router.get('/', apiMethods.getOne);//edit to match docs
-// router.post('/', apiMethods.);
-// router.get('/meta', apiMethods.);
-// router.put('/:review_id/helpful', apiMethods.);
-// router.put('/:review_id/report', apiMethods.);
+router.get('/:product_id', apiMethods.getReviews);
+// router.post('/:product_id', apiMethods.postReviews);
+// router.get('/meta/:product_id', apiMethods.getMetadata);
+// router.put('/:review_id/helpful', apiMethods.putHelpfulReview);
+// router.put('/:review_id/report', apiMethods.putReportReview);
 
 export default router;
