@@ -39,37 +39,62 @@ const apiMethods = {
     }
   },
   getMetadata: async (req, res) => {
-    const productId = req.params.product_id;
+    try {
+      const productId = req.params.product_id;
 
-    const generatedResponse = {
-      product: productId,
-      ratings: {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0
-      },
-      recommended: {
-        false: 0,
-        true: 0
-      },
-      characteristics: {}
-    }
-
-    const queryString = `SELECT id, name FROM characteristics WHERE product_id=?`
-    const charQuery = await db.query(queryString, productId)
-    const productCharacteristics = charQuery[0]
-    for (let i = 0; i < productCharacteristics.length; i++) {
-      const charToAdd = productCharacteristics[i].name
-      const idToAdd = productCharacteristics[i].id
-      generatedResponse.characteristics[charToAdd] = {
-        id: idToAdd,
-        value: 0
+      const generatedResponse = {
+        product: productId,
+        ratings: {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0
+        },
+        recommended: {
+          false: 0,
+          true: 0
+        },
+        characteristics: {}
       }
-    }
 
-    res.json(generatedResponse)
+      const queryString = `SELECT id, name FROM characteristics WHERE product_id=?`
+      const charQuery = await db.query(queryString, productId)
+      const productCharacteristics = charQuery[0]
+      for (let i = 0; i < productCharacteristics.length; i++) {
+        const charToAdd = productCharacteristics[i].name
+        const idToAdd = productCharacteristics[i].id
+        generatedResponse.characteristics[charToAdd] = {
+          id: idToAdd,
+          value: 0
+        }
+      }
+      const queryString2 = `SELECT rating, recommend FROM reviews WHERE product_id=${productId}`
+      const rateAndRecommend = await db.query(queryString2)
+      const rateAndRecommendCount = rateAndRecommend[0]
+      for (let x = 0; x < rateAndRecommendCount.length; x++) {
+        const currentRating = rateAndRecommendCount[x].rating
+        const currentRecommend = rateAndRecommendCount[x].recommend
+        generatedResponse.ratings[currentRating]++
+        generatedResponse.recommended[currentRecommend]++
+      }
+      const queryString3 = `SELECT cr.value, c.name FROM characteristic_reviews cr INNER JOIN reviews r ON cr.review_id=r.id INNER JOIN characteristics c ON cr.characteristic_id=c.id WHERE r.product_id=${productId}`
+      const charValues = await db.query(queryString3)
+      const numberOfRows = await db.query(`SELECT COUNT(*) AS number FROM reviews WHERE product_id=${productId}`)
+      const numberOfReviews = numberOfRows[0][0]['number']
+      const charValuesData = charValues[0];
+      for (let y = 0; y < charValuesData.length; y++) {
+        const charDescription = charValuesData[y].name
+        const charValue = charValuesData[y].value
+        generatedResponse.characteristics[charDescription].value += (charValue/numberOfReviews)
+      }
+
+      res.status(200).json(generatedResponse)
+
+    } catch(err) {
+      console.error('error at getMetadata', err)
+      res.status(500).send(err)
+    }
   },
   postReviews: {},
   putHelpfulReview: {},
