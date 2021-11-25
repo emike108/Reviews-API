@@ -14,11 +14,15 @@ const apiMethods = {
         results: []
       }
 
-      const queryString1 = `SELECT id AS review_id, rating, summary, recommend, response, body, FROM_UNIXTIME(date/1000) AS date, reviewer_name, helpfulness FROM reviews WHERE product_id=?`
+      const queryString1 = `SELECT id AS review_id, rating, summary, recommend, response, body, FROM_UNIXTIME(date/1000) AS date, reviewer_name, helpfulness, reported FROM reviews WHERE product_id=?`
       const reviewsResults = await db.query(queryString1, productId);
       const reviewsResultsData = reviewsResults[0]
       for (let i = 0; i < reviewsResultsData.length; i++) {
         const review = reviewsResultsData[i]
+        if (review.reported === 'true') {
+          continue
+        }
+        delete review.reported
         review['photos'] = []
         const reviewId = review.review_id;
         const queryString2 = `SELECT id, url FROM reviews_photos WHERE review_id=?`;
@@ -145,8 +149,25 @@ const apiMethods = {
       res.status(400).send(err)
     }
   },
-  putHelpfulReview: {},
-  putReportReview: {}
+  putHelpfulReview: async (req, res) => {
+    //obtain review Id from parameters
+    //using an upate mysql statement
+    //increment the reviews table helpfullness column by one
+    //respond with message saying review # has been marked as helpful
+
+    //catch
+    //Cannot mark review as helpful...
+  },
+  putReportReview: async (req, res) => {
+    //obtain review id from parameters
+    //use review id to get the review row
+    //submit sql update query to change to true
+    //send response of 'Succesfully reported review #'
+
+    //catch
+    //send response of 'Cannot report review...'
+
+  }
 }
 
 export default apiMethods;
