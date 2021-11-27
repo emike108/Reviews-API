@@ -150,21 +150,26 @@ const apiMethods = {
     }
   },
   putHelpfulReview: async (req, res) => {
-    //obtain review Id from parameters
-    //using an upate mysql statement
-    //increment the reviews table helpfullness column by one
-    //respond with message saying review # has been marked as helpful
-
-    //catch
-    //Cannot mark review as helpful...
+    try {
+      const reviewId = req.params.review_id;
+      const queryString = 'UPDATE reviews SET helpfulness=helpfulness+1 WHERE id=?'
+      const updateHelpfulness = await db.query(queryString, reviewId)
+      console.log(`Helpfulness value incremented on review ${reviewId}`)
+      res.status(200).send(`Successfully marked review #${reviewId} as helpful`)
+    } catch(err) {
+      console.log('Unable to mark review ${reviewId} as helpful')
+      res.status(500).send(err)
+    }
   },
   putReportReview: async (req, res) => {
     try {
       const reviewId = req.params.review_id;
       const queryString = 'UPDATE reviews SET reported="true" WHERE id=?'
       const updateToReported = await db.query(queryString, reviewId)
+      console.log(`Review #${reviewId} successfully reported`)
       res.status(200).send(`Successfully reported review #${reviewId}`)
     } catch(err) {
+      console.log('Unable to mark review as reported', err)
       res.status(500).send(err);
     }
   }
