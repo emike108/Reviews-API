@@ -159,14 +159,14 @@ const apiMethods = {
     //Cannot mark review as helpful...
   },
   putReportReview: async (req, res) => {
-    //obtain review id from parameters
-    //use review id to get the review row
-    //submit sql update query to change to true
-    //send response of 'Succesfully reported review #'
-
-    //catch
-    //send response of 'Cannot report review...'
-
+    try {
+      const reviewId = req.params.review_id;
+      const queryString = 'UPDATE reviews SET reported="true" WHERE id=?'
+      const updateToReported = await db.query(queryString, reviewId)
+      res.status(200).send(`Successfully reported review #${reviewId}`)
+    } catch(err) {
+      res.status(500).send(err);
+    }
   }
 }
 
