@@ -142,7 +142,7 @@ const apiMethods = {
           const charValueEntry = await db.query(queryString4, [charEntryId, reviewEntryId, currentCharValue])
         }
       }
-      console.log(`request added with review id ${reviewEntryId}`, req.body)
+      console.log(`request posted with review id ${reviewEntryId}`, req.body)
       res.status(201).send(`Successfully added review ${reviewEntryId}!`)
     } catch(err) {
       console.log('Unable to add review.. ', err)
